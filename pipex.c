@@ -6,7 +6,7 @@
 /*   By: apereira <apereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 15:04:58 by apereira          #+#    #+#             */
-/*   Updated: 2023/02/28 16:57:08 by apereira         ###   ########.fr       */
+/*   Updated: 2023/02/28 17:28:37 by apereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 // /usr/local/games
 // /snap/bin
 
-int	check_valid_cmd(char *argv, char **env)
+char	*check_valid_cmd(char *argv, char **env)
 {
 	int		i;
 	char	**split_paths;
@@ -42,10 +42,10 @@ int	check_valid_cmd(char *argv, char **env)
 					return (split_paths[i]);
 				i++;
 			}
-			return (NULL);
 		}
 		i++;
 	}
+	return (NULL);
 }
 
 int	main(int argc, char **argv, char **env)
