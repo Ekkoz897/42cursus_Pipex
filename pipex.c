@@ -58,8 +58,8 @@ int	main(int argc, char **argv, char **env)
 	argv[4] = ft_strjoin("./", argv[4]);
 	vars.fd1 = open(argv[1], O_RDONLY);
 	vars.fd1 = open(argv[4], O_RDONLY);
-	vars.cmd_path1 = check_valid_cmd(argv[2], env);
-	vars.cmd_path1 = check_valid_cmd(argv[3], env);
 	vars.cmd_flags1 = ft_split(argv[2], ' ');
 	vars.cmd_flags2 = ft_split(argv[3], ' ');
+	vars.cmd_path1 = check_valid_cmd(vars.cmd_flags1[0], env);
+	vars.cmd_path2 = check_valid_cmd(vars.cmd_flags2[0], env);
 }
