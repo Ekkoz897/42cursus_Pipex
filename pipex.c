@@ -6,40 +6,60 @@
 /*   By: apereira <apereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 15:04:58 by apereira          #+#    #+#             */
-/*   Updated: 2023/02/27 16:19:33 by apereira         ###   ########.fr       */
+/*   Updated: 2023/02/28 16:57:08 by apereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-int	main(int argc, char **argv)
+// /nfs/homes/apereira/.bun/bin
+// /nfs/homes/apereira/bin
+// /usr/local/sbin
+// /usr/sbin
+// /sbin
+// /bin
+// /usr/games
+// /usr/local/games
+// /snap/bin
+
+int	check_valid_cmd(char *argv, char **env)
 {
-	int	fd[2];
-	int	pid1;
-	int	pid2;
+	int		i;
+	char	**split_paths;
+	char	*path;
+
+	i = 0;
+	while (env[i])
+	{
+		if (ft_strnstr(env[i], "PATH=/"))
+		{
+			split_paths = ft_split(env[i], ':');
+			i = 0;
+			while (split_paths[i])
+			{
+				path = ft_strjoin(split_paths[i], argv);
+				if (access(path, X_OK))
+					return (split_paths[i]);
+				i++;
+			}
+			return (NULL);
+		}
+		i++;
+	}
+}
+
+int	main(int argc, char **argv, char **env)
+{
+	t_vars	vars;
 
 	if (argc != 4)
 		return (0);
-	if (pipe(fd) == -1)
-		return (0);
-	pid1 = fork();
-	if (pid1 < 0)
-		return (0);
-	if (pid1 == 0)
-	{
-		dup2(fd[1], 1);
-		close(fd[0]);
-		close(fd[1]);
-		execve(argv[0], &argv[2], NULL);
-	}
-	pid2 = fork();
-	if (pid2 < 0)
-		return (0);
-	if (pid2 == 0)
-	{
-		dup2(fd[0], 1);
-		close(fd[0]);
-		close(fd[1]);
-		execve(argv[0], &argv[4], NULL);
-	}
+	argv[1] = ft_strjoin("./", argv[1]);
+	argv[4] = ft_strjoin("./", argv[4]);
+	vars.fd1 = open(argv[1], O_RDONLY);
+	vars.fd1 = open(argv[4], O_RDONLY);
+	vars.cmd_path1 = check_valid_cmd(argv[2], env);
+	vars.cmd_path1 = check_valid_cmd(argv[3], env);
+	vars.cmd_flags1 = ft_split(argv[2], ' ');
+	vars.cmd_flags2 = ft_split(argv[3], ' ');
 }

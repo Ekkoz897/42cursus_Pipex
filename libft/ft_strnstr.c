@@ -6,7 +6,7 @@
 /*   By: apereira <apereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/24 11:43:13 by apereira          #+#    #+#             */
-/*   Updated: 2022/11/09 19:51:32 by apereira         ###   ########.fr       */
+/*   Updated: 2023/02/28 16:33:41 by apereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
  * @return The address of the first character of the substring.
  */
 
-char	*ft_strnstr(const char *str, const char *word, size_t n)
+char	*ft_strnstr(const char *str, const char *word)
 {
 	size_t	i;
 	size_t	j;
@@ -31,7 +31,7 @@ char	*ft_strnstr(const char *str, const char *word, size_t n)
 	i = 0;
 	if (word[i] == '\0')
 		return ((char *)str);
-	while ((i < n) && (str[i]))
+	while ((str[i]))
 	{
 		j = 0;
 		while (str[i + j] == word[j] && ((i + j) < n))
