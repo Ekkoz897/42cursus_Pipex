@@ -6,60 +6,121 @@
 /*   By: apereira <apereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 15:04:58 by apereira          #+#    #+#             */
-/*   Updated: 2023/02/28 17:28:37 by apereira         ###   ########.fr       */
+/*   Updated: 2023/03/03 13:28:16 by apereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-// /nfs/homes/apereira/.bun/bin
-// /nfs/homes/apereira/bin
-// /usr/local/sbin
-// /usr/sbin
-// /sbin
-// /bin
-// /usr/games
-// /usr/local/games
-// /snap/bin
+void	ft_free(char **array)
+{
+	int	i;
 
-char	*check_valid_cmd(char *argv, char **env)
+	i = 0;
+	while (array[i])
+	{
+		free(array[i]);
+		i++;
+	}
+}
+
+// Finds the PATH string in the "env" text
+char	*find_path(char **envp)
+{
+	while (ft_strncmp("PATH", *envp, 4))
+		envp++;
+	return (*envp + 5);
+}
+
+// Checks if the command received in ARGV is valid by
+// searching for it in the bin folder
+char	*check_valid_cmd(char *argv, char **envp)
 {
 	int		i;
 	char	**split_paths;
 	char	*path;
+	char	*temp;
+	char	*cmd;
 
+	cmd = find_path(envp);
+	split_paths = ft_split(cmd, ':');
 	i = 0;
-	while (env[i])
+	while (split_paths[i])
 	{
-		if (ft_strnstr(env[i], "PATH=/"))
+		temp = ft_strjoin(split_paths[i], "/");
+		path = ft_strjoin(temp, argv);
+		free (temp);
+		if (access(path, 0) == 0)
 		{
-			split_paths = ft_split(env[i], ':');
-			i = 0;
-			while (split_paths[i])
-			{
-				path = ft_strjoin(split_paths[i], argv);
-				if (access(path, X_OK))
-					return (split_paths[i]);
-				i++;
-			}
+			ft_free (split_paths);
+			return (path);
 		}
+		free (path);
 		i++;
 	}
+	ft_free (split_paths);
 	return (NULL);
 }
 
-int	main(int argc, char **argv, char **env)
+int	main(int argc, char **argv, char **envp)
 {
 	t_vars	vars;
+	int		pipe_fd[2];
 
-	if (argc != 4)
-		return (0);
+	if (argc != 5)
+		return (ft_printf("Error, wrong number of arguments\n"));
+	if (pipe(pipe_fd) < 0)
+		return (ft_printf("Error, PIPE"));
 	argv[1] = ft_strjoin("./", argv[1]);
 	argv[4] = ft_strjoin("./", argv[4]);
+	//
 	vars.fd1 = open(argv[1], O_RDONLY);
-	vars.fd1 = open(argv[4], O_RDONLY);
-	vars.cmd_flags1 = ft_split(argv[2], ' ');
-	vars.cmd_flags2 = ft_split(argv[3], ' ');
-	vars.cmd_path1 = check_valid_cmd(vars.cmd_flags1[0], env);
-	vars.cmd_path2 = check_valid_cmd(vars.cmd_flags2[0], env);
+	if (vars.fd1 < 0)
+		return (ft_printf("Error, the 1st file is invalid\n"));
+	vars.cmd1_flags = ft_split(argv[2], ' ');
+	vars.cmd1_path = check_valid_cmd(vars.cmd1_flags[0], envp);
+	if (!vars.cmd1_path)
+		return (ft_printf("Error, 1st command is invalid\n"));
+	vars.pid1 = fork();
+	if (vars.pid1 < 0)
+		exit (0);
+	if (vars.pid1 == 0)
+	{
+		dup2(vars.fd1, STDIN_FILENO);
+		dup2(pipe_fd[1], STDOUT_FILENO);
+		close (pipe_fd[0]);
+		close (pipe_fd[1]);
+		execve(vars.cmd1_path, vars.cmd1_flags, envp);
+	}
+	// waitpid(vars.pid1, NULL, 0);
+	//
+	vars.fd2 = open(argv[4], O_RDWR);
+	if (vars.fd1 < 0)
+		return (ft_printf("Error, the 2nd file is invalid\n"));
+	vars.cmd2_flags = ft_split(argv[3], ' ');
+	vars.cmd2_path = check_valid_cmd(vars.cmd2_flags[0], envp);
+	ft_printf("2nd command: %s\n", vars.cmd2_path);
+	if (!vars.cmd1_path)
+		return (ft_printf("Error, 2nd command is invalid\n"));
+	vars.pid2 = fork();
+	if (vars.pid2 < 0)
+		exit (0);
+	if (vars.pid2 == 0)
+	{
+		dup2(vars.fd2, STDIN_FILENO);
+		dup2(pipe_fd[1], STDOUT_FILENO);
+		close (pipe_fd[0]);
+		close (pipe_fd[1]);
+		execve(vars.cmd2_path, vars.cmd2_flags, envp);
+	}
+	// waitpid(vars.pid2, NULL, 0);
+	//
+	free (argv[1]);
+	free (argv[4]);
+	free (vars.cmd2_flags);
+	free (vars.cmd1_flags);
+	free (vars.cmd1_path);
+	free (vars.cmd2_path);
+	close (vars.fd1);
+	close (vars.fd2);
 }

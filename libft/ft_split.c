@@ -6,7 +6,7 @@
 /*   By: apereira <apereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/24 15:45:56 by apereira          #+#    #+#             */
-/*   Updated: 2022/11/09 19:51:02 by apereira         ###   ########.fr       */
+/*   Updated: 2023/03/03 12:42:47 by apereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,63 +17,93 @@
  * 
  */
 
-static int	ft_words(char const *str, char sep)
+static size_t	words_count(char *s, char c)
 {
-	int		wd_nbr;
+	size_t	i;
+	size_t	j;
 
-	wd_nbr = 0;
-	while (*str)
+	i = 0;
+	j = 0;
+	while (*s)
 	{
-		if (*str != sep && *str)
+		if (*s != c)
+			i++;
+		else if (*s == c && i != 0)
 		{
-			while (*str && *str != sep)
-				str++;
-			wd_nbr++;
+			j++;
+			i = 0;
 		}
-		while (*str == sep && *str)
-			str++;
+		s++;
 	}
-	return (wd_nbr);
+	if (i != 0)
+		j++;
+	return (j);
 }
 
-static int	ft_chars(char const *str, char c)
+static char	*word(char *s, char c)
 {
-	int	counter;
+	char	*buf;
 
-	counter = 0;
-	while (*str != c && *str != '\0')
+	while (*s == c)
+		s++;
+	buf = s;
+	while (*buf && *buf != c)
+		buf++;
+	*buf = '\0';
+	return (ft_strdup(s));
+}
+
+static char	**free_arr(char **arr, char *s)
+{
+	size_t	i;
+
+	i = 0;
+	while (arr[i])
 	{
-		counter++;
-		str++;
+		free(arr[i]);
+		i++;
 	}
-	return (counter);
+	free(arr);
+	free(s);
+	return (NULL);
+}
+
+static char	**worker(char **arr, char *s1, char c, size_t j)
+{
+	size_t	i;
+	char	*str;
+
+	str = s1;
+	i = 0;
+	while (i < j)
+	{
+		if (*s1 != c)
+		{
+			arr[i] = word(s1, c);
+			if (!arr[i])
+				return (free_arr(arr, s1));
+			s1 = s1 + ft_strlen(arr[i]);
+			i++;
+		}
+		s1++;
+	}
+	arr[i] = NULL;
+	free(str);
+	return (arr);
 }
 
 char	**ft_split(char const *s, char c)
 {
-	char	**g;
-	size_t	i;
-	size_t	l;
-	int		word;
-	char	*str;
+	char	**w_arr;
+	char	*s1;
+	size_t	j;
 
-	i = 0;
-	g = (char **)malloc(sizeof(char *) * (ft_words(s, c) + 1));
-	if (!g || !s)
+	s1 = ft_strdup(s);
+	if (!s1)
 		return (NULL);
-	word = 0;
-	while (*(s + i))
-	{
-		while (*(s + i) && *(s + i) == c)
-			i++;
-		if (*(s + i) && *(s + i) != c)
-		{
-			str = (char *)s + i;
-			l = ft_chars(str, c);
-			g[word++] = ft_substr(s, i, l);
-			i += l;
-		}
-	}
-	g[word] = NULL;
-	return (g);
+	j = words_count(s1, c);
+	w_arr = (char **)malloc(sizeof(char *) * (j + 1));
+	if (!w_arr)
+		return (NULL);
+	return (worker(w_arr, s1, c, j));
 }

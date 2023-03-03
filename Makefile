@@ -4,8 +4,7 @@ CC = cc
 
 RM = rm -f
 
-CFLAGS = -Wall -Werror -Wextra -g -fsanitize=address
-
+CFLAGS = -Wall -Werror -Wextra
 SRC = pipex.c
 
 all:	$(NAME)
@@ -23,6 +22,9 @@ fclean: clean
 	@find . -type f \( -name "*.a" -o -name "pipex" \) -delete
 
 re: fclean all
+
+valgrind: all
+	valgrind --leak-check=yes --leak-check=full --show-leak-kinds=all ./pipex aa "grep wc" "ls -l" bb
 
 git: fclean
 	@git add .
