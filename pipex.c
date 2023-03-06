@@ -6,7 +6,7 @@
 /*   By: apereira <apereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 15:04:58 by apereira          #+#    #+#             */
-/*   Updated: 2023/03/06 07:42:32 by apereira         ###   ########.fr       */
+/*   Updated: 2023/03/06 12:13:30 by apereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ char	*check_valid_cmd(char *argv, char **envp)
 		free (temp);
 		if (access(path, 0) == 0)
 		{
-			ft_free (split_paths);
+			ft_free(split_paths);
 			return (path);
 		}
 		free (path);
@@ -51,8 +51,6 @@ int	main(int argc, char **argv, char **envp)
 		return (ft_printf("Error, wrong number of arguments\n"));
 	if (pipe(pipe_fd) < 0)
 		return (ft_printf("Error, PIPE"));
-	argv[1] = ft_strjoin("./", argv[1]);
-	argv[4] = ft_strjoin("./", argv[4]);
 	//
 	vars.fd1 = open(argv[1], O_RDONLY);
 	if (vars.fd1 < 0)
@@ -66,10 +64,9 @@ int	main(int argc, char **argv, char **envp)
 		exit (0);
 	if (vars.pid1 == 0)
 	{
-		dup2(vars.fd1, STDIN_FILENO);
 		dup2(pipe_fd[1], STDOUT_FILENO);
 		close (pipe_fd[0]);
-		close (pipe_fd[1]);
+		dup2(vars.fd1, STDIN_FILENO);
 		execve(vars.cmd1_path, vars.cmd1_flags, envp);
 	}
 	// waitpid(vars.pid1, NULL, 0);
@@ -86,13 +83,12 @@ int	main(int argc, char **argv, char **envp)
 		exit (0);
 	if (vars.pid2 == 0)
 	{
-		dup2(vars.fd2, STDIN_FILENO);
-		dup2(pipe_fd[1], STDOUT_FILENO);
-		close (pipe_fd[0]);
+		dup2(pipe_fd[0], STDIN_FILENO);
 		close (pipe_fd[1]);
+		dup2(vars.fd2, STDOUT_FILENO);
 		execve(vars.cmd2_path, vars.cmd2_flags, envp);
 	}
 	// waitpid(vars.pid2, NULL, 0);
 	//
-	clean_program(argv, &vars);
+	clean_program(&vars);
 }

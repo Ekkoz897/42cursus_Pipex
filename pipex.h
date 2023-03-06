@@ -6,7 +6,7 @@
 /*   By: apereira <apereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 15:05:05 by apereira          #+#    #+#             */
-/*   Updated: 2023/03/06 07:43:06 by apereira         ###   ########.fr       */
+/*   Updated: 2023/03/06 12:07:17 by apereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,9 @@ typedef struct s_vars
 	char	**cmd2_flags;
 }t_vars;
 
-void	clean_program(char **argv, t_vars *vars);
+// Util functions
+void	ft_free(char **array);
+void	clean_program(t_vars *vars);
+char	*find_path(char **envp);
 
 #endif

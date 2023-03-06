@@ -6,7 +6,7 @@
 /*   By: apereira <apereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/06 07:39:17 by apereira          #+#    #+#             */
-/*   Updated: 2023/03/06 07:42:57 by apereira         ###   ########.fr       */
+/*   Updated: 2023/03/06 12:15:11 by apereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,10 @@ char	*find_path(char **envp)
 }
 
 // Frees all the mallocs
-void	clean_program(char **argv, t_vars *vars)
+void	clean_program(t_vars *vars)
 {
-	free (argv[1]);
-	free (argv[4]);
-	free (vars->cmd2_flags);
-	free (vars->cmd1_flags);
+	ft_free (vars->cmd1_flags);
+	ft_free (vars->cmd2_flags);
 	free (vars->cmd1_path);
 	free (vars->cmd2_path);
 	close (vars->fd1);

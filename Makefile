@@ -5,7 +5,8 @@ CC = cc
 RM = rm -f
 
 CFLAGS = -Wall -Werror -Wextra
-SRC = pipex.c
+
+SRC = pipex.c pipex_utils.c
 
 all:	$(NAME)
 
