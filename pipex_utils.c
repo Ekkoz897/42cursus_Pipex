@@ -6,7 +6,7 @@
 /*   By: apereira <apereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/06 07:39:17 by apereira          #+#    #+#             */
-/*   Updated: 2023/03/06 12:15:11 by apereira         ###   ########.fr       */
+/*   Updated: 2023/03/06 13:48:58 by apereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ void	ft_free(char **array)
 		free(array[i]);
 		i++;
 	}
+	free (array);
 }
 
 // Finds the PATH string in the "env" text
