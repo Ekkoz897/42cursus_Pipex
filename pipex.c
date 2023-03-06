@@ -6,7 +6,7 @@
 /*   By: apereira <apereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 15:04:58 by apereira          #+#    #+#             */
-/*   Updated: 2023/03/06 13:47:23 by apereira         ###   ########.fr       */
+/*   Updated: 2023/03/06 14:25:47 by apereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,23 +45,23 @@ char	*check_valid_cmd(char *argv, char **envp)
 // Opens the first file FD, parses the first command by duplicating it
 // and executes it. Passes the output onto the next command instead of
 // to the standard output.
-int	first_process(t_vars *vars, char **argv, char **envp, int *pipe_fd)
+void	first_process(t_vars *vars, char **argv, char **envp, int *pipe_fd)
 {
 	vars->fd1 = open(argv[1], O_RDONLY);
 	if (vars->fd1 < 0)
 	{
-		return (0);
 		ft_printf("Error, the 1st file is invalid\n");
+		return ;
 	}
 	vars->cmd1_path = check_valid_cmd(vars->cmd1_flags[0], envp);
 	if (!vars->cmd1_path)
 	{
 		ft_printf("Error, 1st command is invalid\n");
-		return (0);
+		return ;
 	}
 	vars->pid1 = fork();
 	if (vars->pid1 < 0)
-		return (0);
+		return ;
 	if (vars->pid1 == 0)
 	{
 		dup2(pipe_fd[1], STDOUT_FILENO);
@@ -69,29 +69,28 @@ int	first_process(t_vars *vars, char **argv, char **envp, int *pipe_fd)
 		dup2(vars->fd1, STDIN_FILENO);
 		execve(vars->cmd1_path, vars->cmd1_flags, envp);
 	}
-	return (1);
 }
 
 // Opens the second file FD, parses the second command by duplicating it
 // and executes it. Passes the output onto the second file instead of
 // to the standard output.
-int	second_process(t_vars *vars, char **argv, char **envp, int *pipe_fd)
+void	second_process(t_vars *vars, char **argv, char **envp, int *pipe_fd)
 {
 	vars->fd2 = open(argv[4], O_RDWR);
 	if (vars->fd2 < 0)
 	{
 		ft_printf("Error, the 2nd file is invalid\n");
-		return (0);
+		return ;
 	}
 	vars->cmd2_path = check_valid_cmd(vars->cmd2_flags[0], envp);
-	if (!vars->cmd1_path)
+	if (!vars->cmd2_path)
 	{
 		ft_printf("Error, 2nd command is invalid\n");
-		return (0);
+		return ;
 	}
 	vars->pid2 = fork();
 	if (vars->pid2 < 0)
-		return (0);
+		return ;
 	if (vars->pid2 == 0)
 	{
 		dup2(pipe_fd[0], STDIN_FILENO);
@@ -99,9 +98,9 @@ int	second_process(t_vars *vars, char **argv, char **envp, int *pipe_fd)
 		dup2(vars->fd2, STDOUT_FILENO);
 		execve(vars->cmd2_path, vars->cmd2_flags, envp);
 	}
-	return (1);
 }
 
+// 
 int	main(int argc, char **argv, char **envp)
 {
 	t_vars	vars;
@@ -115,6 +114,8 @@ int	main(int argc, char **argv, char **envp)
 	vars.cmd2_flags = ft_split(argv[3], ' ');
 	first_process(&vars, argv, envp, pipe_fd);
 	second_process(&vars, argv, envp, pipe_fd);
+	close (pipe_fd[0]);
+	close (pipe_fd[1]);
 	waitpid(vars.pid1, NULL, 0);
 	waitpid(vars.pid2, NULL, 0);
 	clean_program(&vars);
