@@ -6,31 +6,11 @@
 /*   By: apereira <apereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 15:04:58 by apereira          #+#    #+#             */
-/*   Updated: 2023/03/03 13:28:16 by apereira         ###   ########.fr       */
+/*   Updated: 2023/03/06 07:42:32 by apereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-void	ft_free(char **array)
-{
-	int	i;
-
-	i = 0;
-	while (array[i])
-	{
-		free(array[i]);
-		i++;
-	}
-}
-
-// Finds the PATH string in the "env" text
-char	*find_path(char **envp)
-{
-	while (ft_strncmp("PATH", *envp, 4))
-		envp++;
-	return (*envp + 5);
-}
 
 // Checks if the command received in ARGV is valid by
 // searching for it in the bin folder
@@ -99,7 +79,6 @@ int	main(int argc, char **argv, char **envp)
 		return (ft_printf("Error, the 2nd file is invalid\n"));
 	vars.cmd2_flags = ft_split(argv[3], ' ');
 	vars.cmd2_path = check_valid_cmd(vars.cmd2_flags[0], envp);
-	ft_printf("2nd command: %s\n", vars.cmd2_path);
 	if (!vars.cmd1_path)
 		return (ft_printf("Error, 2nd command is invalid\n"));
 	vars.pid2 = fork();
@@ -115,12 +94,5 @@ int	main(int argc, char **argv, char **envp)
 	}
 	// waitpid(vars.pid2, NULL, 0);
 	//
-	free (argv[1]);
-	free (argv[4]);
-	free (vars.cmd2_flags);
-	free (vars.cmd1_flags);
-	free (vars.cmd1_path);
-	free (vars.cmd2_path);
-	close (vars.fd1);
-	close (vars.fd2);
+	clean_program(argv, &vars);
 }
