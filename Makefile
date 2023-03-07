@@ -4,7 +4,7 @@ CC = cc
 
 RM = rm -f
 
-CFLAGS = -Wall -Werror -Wextra
+CFLAGS = -Wall -Werror -Wextra -g -fsanitize=address
 
 SRC = pipex.c pipex_utils.c
 

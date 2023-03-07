@@ -6,7 +6,7 @@
 /*   By: apereira <apereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/06 07:39:17 by apereira          #+#    #+#             */
-/*   Updated: 2023/03/06 14:05:50 by apereira         ###   ########.fr       */
+/*   Updated: 2023/03/07 17:49:06 by apereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,10 @@ void	ft_free(char **array)
 	free (array);
 }
 
-// Finds the PATH string in the "env" text
+// Finds the PATH string in the "envp" text
 char	*find_path(char **envp)
 {
-	while (ft_strncmp("PATH", *envp, 4))
+	while (ft_strncmp("PATH=", *envp, 5))
 		envp++;
 	return (*envp + 5);
 }

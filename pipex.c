@@ -6,7 +6,7 @@
 /*   By: apereira <apereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 15:04:58 by apereira          #+#    #+#             */
-/*   Updated: 2023/03/07 15:06:18 by apereira         ###   ########.fr       */
+/*   Updated: 2023/03/07 18:25:30 by apereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ void	first_process(t_vars *vars, char **argv, char **envp, int *pipe_fd)
 		return ;
 	if (vars->pid1 == 0)
 	{
+		vars->cmd1_path = check_valid_cmd(vars->cmd1_flags[0], envp);
 		dup2(pipe_fd[1], STDOUT_FILENO);
 		close (pipe_fd[0]);
 		dup2(vars->fd1, STDIN_FILENO);
@@ -74,9 +75,12 @@ void	first_process(t_vars *vars, char **argv, char **envp, int *pipe_fd)
 // Opens the second file FD, parses the second command by duplicating it
 // and executes it. Passes the output onto the second file instead of
 // to the standard output.
+// O_TRUNC deletes file contents so we can write to the file, O_CREAT creates 
+// a file if there isn't one available, O_RDWR opens a FD to read and write.
+// The number sets the perms of the file so it can be read from and wrote on.
 void	second_process(t_vars *vars, char **argv, char **envp, int *pipe_fd)
 {
-	vars->fd2 = open(argv[4], O_RDWR);
+	vars->fd2 = open(argv[4], O_TRUNC | O_CREAT | O_RDWR, 0000644);
 	if (vars->fd2 < 0)
 	{
 		perror("Outfile");
