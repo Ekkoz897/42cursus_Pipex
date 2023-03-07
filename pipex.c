@@ -6,7 +6,7 @@
 /*   By: apereira <apereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 15:04:58 by apereira          #+#    #+#             */
-/*   Updated: 2023/03/06 14:25:47 by apereira         ###   ########.fr       */
+/*   Updated: 2023/03/07 15:06:18 by apereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,13 +50,7 @@ void	first_process(t_vars *vars, char **argv, char **envp, int *pipe_fd)
 	vars->fd1 = open(argv[1], O_RDONLY);
 	if (vars->fd1 < 0)
 	{
-		ft_printf("Error, the 1st file is invalid\n");
-		return ;
-	}
-	vars->cmd1_path = check_valid_cmd(vars->cmd1_flags[0], envp);
-	if (!vars->cmd1_path)
-	{
-		ft_printf("Error, 1st command is invalid\n");
+		perror("Infile");
 		return ;
 	}
 	vars->pid1 = fork();
@@ -67,6 +61,12 @@ void	first_process(t_vars *vars, char **argv, char **envp, int *pipe_fd)
 		dup2(pipe_fd[1], STDOUT_FILENO);
 		close (pipe_fd[0]);
 		dup2(vars->fd1, STDIN_FILENO);
+		vars->cmd1_path = check_valid_cmd(vars->cmd1_flags[0], envp);
+		if (!vars->cmd1_path)
+		{
+			perror("Command not found.\n");
+			return ;
+		}
 		execve(vars->cmd1_path, vars->cmd1_flags, envp);
 	}
 }
@@ -79,13 +79,7 @@ void	second_process(t_vars *vars, char **argv, char **envp, int *pipe_fd)
 	vars->fd2 = open(argv[4], O_RDWR);
 	if (vars->fd2 < 0)
 	{
-		ft_printf("Error, the 2nd file is invalid\n");
-		return ;
-	}
-	vars->cmd2_path = check_valid_cmd(vars->cmd2_flags[0], envp);
-	if (!vars->cmd2_path)
-	{
-		ft_printf("Error, 2nd command is invalid\n");
+		perror("Outfile");
 		return ;
 	}
 	vars->pid2 = fork();
@@ -96,6 +90,12 @@ void	second_process(t_vars *vars, char **argv, char **envp, int *pipe_fd)
 		dup2(pipe_fd[0], STDIN_FILENO);
 		close (pipe_fd[1]);
 		dup2(vars->fd2, STDOUT_FILENO);
+		vars->cmd2_path = check_valid_cmd(vars->cmd2_flags[0], envp);
+		if (!vars->cmd2_path)
+		{
+			perror("Command not found.\n");
+			return ;
+		}
 		execve(vars->cmd2_path, vars->cmd2_flags, envp);
 	}
 }
@@ -107,9 +107,15 @@ int	main(int argc, char **argv, char **envp)
 	int		pipe_fd[2];
 
 	if (argc != 5)
-		return (ft_printf("Error, there should be 5 arguments\n"));
+	{
+		write(2, "Invalid number of arguments.\n", 30);
+		return (1);
+	}
 	if (pipe(pipe_fd) < 0)
-		return (ft_printf("Error, PIPE"));
+	{
+		perror("Pipe");
+		exit(1);
+	}
 	vars.cmd1_flags = ft_split(argv[2], ' ');
 	vars.cmd2_flags = ft_split(argv[3], ' ');
 	first_process(&vars, argv, envp, pipe_fd);
