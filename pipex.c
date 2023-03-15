@@ -6,7 +6,7 @@
 /*   By: apereira <apereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 15:04:58 by apereira          #+#    #+#             */
-/*   Updated: 2023/03/15 16:28:56 by apereira         ###   ########.fr       */
+/*   Updated: 2023/03/15 16:29:56 by apereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ char	*check_valid_cmd(char *argv, char **envp)
 	return (NULL);
 }
 
-		
 // Opens the first file FD, parses the first command by duplicating it
 // and executes it. Passes the output onto the next command instead of
 // to the standard output.
