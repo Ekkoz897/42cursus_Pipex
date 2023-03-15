@@ -6,7 +6,7 @@
 /*   By: apereira <apereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 15:04:58 by apereira          #+#    #+#             */
-/*   Updated: 2023/03/15 15:59:51 by apereira         ###   ########.fr       */
+/*   Updated: 2023/03/15 16:28:56 by apereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ char	*check_valid_cmd(char *argv, char **envp)
 	return (NULL);
 }
 
+		
 // Opens the first file FD, parses the first command by duplicating it
 // and executes it. Passes the output onto the next command instead of
 // to the standard output.
@@ -60,12 +61,11 @@ void	first_process(t_vars *vars, char **argv, char **envp, int *pipe_fd)
 	if (vars->pid1 == 0)
 	{
 		vars->cmd1_path = check_valid_cmd(vars->cmd1_flags[0], envp);
+		if (vars->cmd1_path == NULL)
+			exit(1);
 		dup2(pipe_fd[1], STDOUT_FILENO);
 		close (pipe_fd[0]);
 		dup2(vars->fd1, STDIN_FILENO);
-		vars->cmd1_path = check_valid_cmd(vars->cmd1_flags[0], envp);
-		if (!vars->cmd1_path)
-			return ;
 		execve(vars->cmd1_path, vars->cmd1_flags, envp);
 	}
 }
@@ -89,12 +89,12 @@ void	second_process(t_vars *vars, char **argv, char **envp, int *pipe_fd)
 		return ;
 	if (vars->pid2 == 0)
 	{
+		vars->cmd2_path = check_valid_cmd(vars->cmd2_flags[0], envp);
+		if (!vars->cmd2_path)
+			exit(1);
 		dup2(pipe_fd[0], STDIN_FILENO);
 		close (pipe_fd[1]);
 		dup2(vars->fd2, STDOUT_FILENO);
-		vars->cmd2_path = check_valid_cmd(vars->cmd2_flags[0], envp);
-		if (!vars->cmd2_path)
-			return ;
 		execve(vars->cmd2_path, vars->cmd2_flags, envp);
 	}
 }
