@@ -6,7 +6,7 @@
 /*   By: apereira <apereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/06 07:39:17 by apereira          #+#    #+#             */
-/*   Updated: 2023/03/07 17:49:06 by apereira         ###   ########.fr       */
+/*   Updated: 2023/03/15 15:47:48 by apereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,6 @@ void	clean_program(t_vars *vars)
 {
 	ft_free (vars->cmd1_flags);
 	ft_free (vars->cmd2_flags);
-	free (vars->cmd1_path);
-	free (vars->cmd2_path);
 	close (vars->fd1);
 	close (vars->fd2);
 }

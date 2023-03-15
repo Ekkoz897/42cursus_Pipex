@@ -25,7 +25,7 @@ fclean: clean
 re: fclean all
 
 valgrind: all
-	valgrind --leak-check=yes --leak-check=full --show-leak-kinds=all ./pipex aa "grep wc" "ls -l" bb
+	valgrind --leak-check=yes --leak-check=full --show-leak-kinds=all ./pipex aa "notexisting" "ls -l" bb
 
 git: fclean
 	@git add .

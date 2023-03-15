@@ -6,7 +6,7 @@
 /*   By: apereira <apereira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 15:04:58 by apereira          #+#    #+#             */
-/*   Updated: 2023/03/07 18:25:30 by apereira         ###   ########.fr       */
+/*   Updated: 2023/03/15 15:59:51 by apereira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ char	*check_valid_cmd(char *argv, char **envp)
 		i++;
 	}
 	ft_free (split_paths);
+	ft_printf("Command not found: %s\n", argv);
 	return (NULL);
 }
 
@@ -64,10 +65,7 @@ void	first_process(t_vars *vars, char **argv, char **envp, int *pipe_fd)
 		dup2(vars->fd1, STDIN_FILENO);
 		vars->cmd1_path = check_valid_cmd(vars->cmd1_flags[0], envp);
 		if (!vars->cmd1_path)
-		{
-			perror("Command not found.\n");
 			return ;
-		}
 		execve(vars->cmd1_path, vars->cmd1_flags, envp);
 	}
 }
@@ -96,10 +94,7 @@ void	second_process(t_vars *vars, char **argv, char **envp, int *pipe_fd)
 		dup2(vars->fd2, STDOUT_FILENO);
 		vars->cmd2_path = check_valid_cmd(vars->cmd2_flags[0], envp);
 		if (!vars->cmd2_path)
-		{
-			perror("Command not found.\n");
 			return ;
-		}
 		execve(vars->cmd2_path, vars->cmd2_flags, envp);
 	}
 }
